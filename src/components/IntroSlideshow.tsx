@@ -48,32 +48,36 @@ export default function IntroSlideshow({ onEnterGallery }: IntroSlideshowProps) 
     <div className="relative w-full h-[95vh] sm:h-screen overflow-hidden bg-stone-950 flex flex-col justify-between p-8 sm:p-16">
       {/* Absolute Slide Images */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        <AnimatePresence>
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.95 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: 'easeInOut' }}
-            className="absolute inset-0 w-full h-full will-change-[transform,opacity]"
-          >
-            <img
-              src={SLIDES[currentIndex].image}
-              alt="Slide"
-              className="w-full h-full object-cover object-center will-change-transform"
-              referrerPolicy="no-referrer"
-            />
-            {/* Beautiful Radial Vignette Overlay to darken surroundings & highlight character in center */}
-            <div 
-              className="absolute inset-0 pointer-events-none z-1"
+        {SLIDES.map((slide, idx) => {
+          const isActive = currentIndex === idx;
+          return (
+            <div
+              key={idx}
+              className="absolute inset-0 w-full h-full transition-opacity duration-[1500ms] ease-in-out will-change-[opacity]"
               style={{
-                background: 'radial-gradient(circle at center, rgba(0,0,0,0) 15%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.85) 100%)'
+                opacity: isActive ? 0.95 : 0,
+                zIndex: isActive ? 1 : 0,
               }}
-            />
-            {/* Ambient Dark Bottom Gradients to guarantee text and labels legibility */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/35 pointer-events-none z-2" />
-          </motion.div>
-        </AnimatePresence>
+            >
+              <img
+                src={slide.image}
+                alt={`Slide ${idx + 1}`}
+                className="w-full h-full object-cover object-center"
+                loading={idx === 0 ? "eager" : "lazy"}
+                referrerPolicy="no-referrer"
+              />
+              {/* Beautiful Radial Vignette Overlay to darken surroundings & highlight character in center */}
+              <div 
+                className="absolute inset-0 pointer-events-none z-1"
+                style={{
+                  background: 'radial-gradient(circle at center, rgba(0,0,0,0) 15%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.85) 100%)'
+                }}
+              />
+              {/* Ambient Dark Bottom Gradients to guarantee text and labels legibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/35 pointer-events-none z-2" />
+            </div>
+          );
+        })}
       </div>
 
       {/* Header - Logo Area */}

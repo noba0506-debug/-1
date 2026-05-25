@@ -126,18 +126,20 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
     const loadCustomPhotos = async () => {
       try {
         const cached = await sagyehwaDB.getAll();
-        if (cached && cached.length > 0) {
-          setAllPhotos([...cached, ...photosData]);
+        const customCached = (cached || []).filter((p) => p.id.startsWith('custom-'));
+        if (customCached.length > 0) {
+          setAllPhotos([...customCached, ...photosData]);
         } else {
           // Fallback connection to legacy LocalStorage
           const saved = localStorage.getItem('sagyehwa_custom_photos');
           if (saved) {
             const legacyPhotos: Photo[] = JSON.parse(saved);
+            const customLegacy = legacyPhotos.filter((p) => p.id.startsWith('custom-'));
             // Migrate automatically to IndexedDB for superior experience
-            for (const photo of legacyPhotos) {
+            for (const photo of customLegacy) {
               await sagyehwaDB.save(photo);
             }
-            setAllPhotos([...legacyPhotos, ...photosData]);
+            setAllPhotos([...customLegacy, ...photosData]);
           }
         }
       } catch (e) {
@@ -146,7 +148,8 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
           const saved = localStorage.getItem('sagyehwa_custom_photos');
           if (saved) {
             const legacyPhotos: Photo[] = JSON.parse(saved);
-            setAllPhotos([...legacyPhotos, ...photosData]);
+            const customLegacy = legacyPhotos.filter((p) => p.id.startsWith('custom-'));
+            setAllPhotos([...customLegacy, ...photosData]);
           }
         } catch (err) {
           console.error('State fallback error:', err);
@@ -736,6 +739,7 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
                     alt={photo.title}
                     className="w-full h-auto object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
                     referrerPolicy="no-referrer"
+                    loading="lazy"
                     style={{
                       aspectRatio: photo.aspectRatio === '3/4' 
                         ? '3/4' 
