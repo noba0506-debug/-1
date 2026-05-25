@@ -724,12 +724,11 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
             return (
               <motion.div
                 key={photo.id}
-                layout
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.6, delay: index * 0.05, ease: 'easeOut' }}
-                className="masonry-grid-col group relative overflow-hidden bg-white rounded-2xl shadow-sm border border-stone-200/40 p-3 hover:shadow-md hover:border-stone-200 transition-all duration-300 cursor-pointer mb-6 break-inside-avoid"
+                className="masonry-grid-col group relative overflow-hidden bg-white rounded-2xl shadow-sm border border-stone-200/40 p-3 hover:shadow-md hover:border-stone-200 transition-all duration-300 cursor-pointer mb-6 break-inside-avoid will-change-transform"
                 onClick={() => openLightbox(photo)}
               >
                 {/* Photo Image Wrapper */}
@@ -1024,7 +1023,7 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
             className="fixed inset-0 z-50 bg-stone-950 select-none cursor-default overflow-hidden flex flex-col justify-between"
           >
             {/* Background Image Ambient Glow: covers the viewport with heavy blur and low opacity to act as an aesthetic color-matching frame */}
-            <div className="absolute inset-0 w-full h-full bg-stone-950 overflow-hidden pointer-events-none">
+            <div className="absolute inset-0 w-full h-full bg-stone-950 overflow-hidden pointer-events-none hidden md:block">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.img
                   key={`bg-${filteredPhotos[slideshowIndex]?.src}`}
@@ -1034,7 +1033,7 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
                   transition={{ duration: 0.8 }}
                   src={filteredPhotos[slideshowIndex]?.src}
                   alt=""
-                  className="w-full h-full object-cover filter blur-3xl scale-110 select-none pointer-events-none"
+                  className="w-full h-full object-cover filter blur-3xl scale-110 select-none pointer-events-none will-change-[transform,opacity]"
                   referrerPolicy="no-referrer"
                 />
               </AnimatePresence>

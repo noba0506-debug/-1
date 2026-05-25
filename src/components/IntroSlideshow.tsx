@@ -51,16 +51,16 @@ export default function IntroSlideshow({ onEnterGallery }: IntroSlideshowProps) 
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, scale: 1.08 }}
+            initial={{ opacity: 0, scale: 1.05 }}
             animate={{ opacity: 0.95, scale: 1 }}
             exit={{ opacity: 0, transition: { duration: 1.8 } }}
             transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 w-full h-full will-change-[transform,opacity]"
           >
             <img
               src={SLIDES[currentIndex].image}
               alt="Slide"
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-center will-change-transform"
               referrerPolicy="no-referrer"
             />
             {/* Beautiful Radial Vignette Overlay to darken surroundings & highlight character in center */}
