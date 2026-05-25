@@ -1,12 +1,17 @@
 import { Photo } from './types';
+import introHero from './main.jpg';
+import springMaster from './main.jpg';
+import summerMaster from './main3 (2).jpg';
+import autumnMaster from './main3 (1).jpg';
+import winterMaster from './main4.jpg';
 
-// Let's import or define the exact generated image assets
+// Let's import or define the exact generated image assets with compiled Vite URLs
 export const GENERATED_IMAGES = {
-  introHero: '/src/main.jpg',
-  springMaster: '/src/main.jpg',
-  summerMaster: '/src/main3 (2).jpg',
-  autumnMaster: '/src/main3 (1).jpg',
-  winterMaster: '/src/main4.jpg'
+  introHero,
+  springMaster,
+  summerMaster,
+  autumnMaster,
+  winterMaster
 };
 
 export const photosData: Photo[] = [
