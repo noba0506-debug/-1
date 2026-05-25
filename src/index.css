@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@400;500;600;700;900&family=Playfair+Display:ital,wght@0,350..600;1,350..600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Noto Sans KR", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Noto Serif KR", "Playfair Display", serif;
+}
+
+/* Custom fade transitions and scrollbar stylings */
+@layer base {
+  body {
+    background-color: #FCFBF9; /* White minimalism - soft ivory tone */
+    color: #1a1a1a;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    scrollbar-width: thin;
+    scrollbar-color: #d1cbc4 #fcfbf9;
+  }
+  
+  /* Smooth custom masonry settings if needed, or we use column-count */
+  .masonry-grid-col {
+    break-inside: avoid;
+    margin-bottom: 24px;
+  }
+}
+
+/* Perfect styling for custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FCFBF9;
+}
+::-webkit-scrollbar-thumb {
+  background: #E5E0DA;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C7C0B7;
+}

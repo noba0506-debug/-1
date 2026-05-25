@@ -1,0 +1,6 @@
+{
+  "name": "사계화 (四季花)",
+  "description": "계절이 피워낸 당신: 각 계절마다 다르게 피어나는 꽃처럼, 변화하는 여자의 아름다움 - 사진작가 김태곤",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
