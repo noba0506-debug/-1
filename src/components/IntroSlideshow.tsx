@@ -50,10 +50,15 @@ export default function IntroSlideshow({ onEnterGallery }: IntroSlideshowProps) 
       <div className="absolute inset-0 pointer-events-none z-0">
         {SLIDES.map((slide, idx) => {
           const isActive = currentIndex === idx;
+          const isNext = (currentIndex + 1) % SLIDES.length === idx;
+          
+          // Only render active or next preloaded slide to prevent mobile browser memory/decode bloat
+          if (!isActive && !isNext) return null;
+
           return (
             <div
               key={idx}
-              className="absolute inset-0 w-full h-full transition-opacity duration-[1500ms] ease-in-out will-change-[opacity]"
+              className="absolute inset-0 w-full h-full transition-opacity duration-[1000ms] ease-in-out will-change-[opacity]"
               style={{
                 opacity: isActive ? 0.95 : 0,
                 zIndex: isActive ? 1 : 0,
@@ -64,7 +69,6 @@ export default function IntroSlideshow({ onEnterGallery }: IntroSlideshowProps) 
                 alt={`Slide ${idx + 1}`}
                 className="w-full h-full object-cover object-center"
                 loading={idx === 0 ? "eager" : "lazy"}
-                referrerPolicy="no-referrer"
               />
               {/* Beautiful Radial Vignette Overlay to darken surroundings & highlight character in center */}
               <div 

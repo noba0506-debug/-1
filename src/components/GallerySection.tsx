@@ -123,40 +123,60 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
 
   // Asynchronously load custom photos from IndexedDB with transparent LocalStorage migration fallback
   useEffect(() => {
+    let active = true;
     const loadCustomPhotos = async () => {
       try {
-        const cached = await sagyehwaDB.getAll();
-        const customCached = (cached || []).filter((p) => p.id.startsWith('custom-'));
+        // Fast-abort timeout race to avoid IndexedDB lockups in hidden mobile webviews/iframes
+        const dbPromise = sagyehwaDB.getAll();
+        const timeoutPromise = new Promise<Photo[]>((res) => setTimeout(() => res([]), 600));
+        const cached = await Promise.race([dbPromise, timeoutPromise]);
+        
+        if (!active) return;
+        const customCached = (cached || []).filter((p) => p && p.id && p.id.startsWith('custom-'));
+        
         if (customCached.length > 0) {
           setAllPhotos([...customCached, ...photosData]);
         } else {
-          // Fallback connection to legacy LocalStorage
-          const saved = localStorage.getItem('sagyehwa_custom_photos');
-          if (saved) {
-            const legacyPhotos: Photo[] = JSON.parse(saved);
-            const customLegacy = legacyPhotos.filter((p) => p.id.startsWith('custom-'));
-            // Migrate automatically to IndexedDB for superior experience
-            for (const photo of customLegacy) {
-              await sagyehwaDB.save(photo);
+          // Fallback connection to legacy LocalStorage wrapped defensively
+          try {
+            if (typeof window !== 'undefined' && window.localStorage) {
+              const saved = localStorage.getItem('sagyehwa_custom_photos');
+              if (saved) {
+                const legacyPhotos: Photo[] = JSON.parse(saved);
+                const customLegacy = (legacyPhotos || []).filter((p) => p && p.id && p.id.startsWith('custom-'));
+                if (customLegacy.length > 0) {
+                  // Migrate background to IndexedDB if possible, but don't block
+                  for (const photo of customLegacy) {
+                    sagyehwaDB.save(photo).catch(() => {});
+                  }
+                  if (active) setAllPhotos([...customLegacy, ...photosData]);
+                }
+              }
             }
-            setAllPhotos([...customLegacy, ...photosData]);
+          } catch (storageErr) {
+            console.warn('LocalStorage reads restricted on mobile context', storageErr);
           }
         }
       } catch (e) {
-        console.error('Failed to load custom photos from IndexedDB, trying localStorage:', e);
+        console.error('Failed primary custom photos check, attempting safe fallback:', e);
         try {
-          const saved = localStorage.getItem('sagyehwa_custom_photos');
-          if (saved) {
-            const legacyPhotos: Photo[] = JSON.parse(saved);
-            const customLegacy = legacyPhotos.filter((p) => p.id.startsWith('custom-'));
-            setAllPhotos([...customLegacy, ...photosData]);
+          if (typeof window !== 'undefined' && window.localStorage) {
+            const saved = localStorage.getItem('sagyehwa_custom_photos');
+            if (saved) {
+              const legacyPhotos: Photo[] = JSON.parse(saved);
+              const customLegacy = (legacyPhotos || []).filter((p) => p && p.id && p.id.startsWith('custom-'));
+              if (active) setAllPhotos([...customLegacy, ...photosData]);
+            }
           }
         } catch (err) {
-          console.error('State fallback error:', err);
+          console.error('State fallback localStorage error:', err);
         }
       }
     };
     loadCustomPhotos();
+    return () => {
+      active = false;
+    };
   }, []);
 
   // UI state for Custom Photo Upload modal / editor
@@ -418,6 +438,10 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
 
   // Keep observing for any beyond 10 scroll triggering
   useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+      return;
+    }
+    
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !isLoadingMore && visibleCount < filteredPhotos.length) {
@@ -597,7 +621,7 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
             placeholder="작품명, 해시태그 검색..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-stone-55 rounded-full text-xs border border-stone-200 focus:outline-none focus:ring-1 focus:ring-stone-400 focus:bg-white transition-all duration-200"
+            className="w-full pl-10 pr-4 py-2 bg-stone-50 rounded-full text-xs border border-stone-200 focus:outline-none focus:ring-1 focus:ring-stone-400 focus:bg-white transition-all duration-200"
           />
           {searchQuery && (
             <button
@@ -738,7 +762,6 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
                     src={photo.src}
                     alt={photo.title}
                     className="w-full h-auto object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
-                    referrerPolicy="no-referrer"
                     loading="lazy"
                     style={{
                       aspectRatio: photo.aspectRatio === '3/4' 
@@ -923,7 +946,6 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
                   src={lightboxPhoto.src}
                   alt={lightboxPhoto.title}
                   className="max-w-full max-h-[60vh] sm:max-h-[75vh] object-contain rounded-xl shadow-2xl filter saturate-[0.95]"
-                  referrerPolicy="no-referrer"
                 />
                 
                 {/* Dynamic Vignette Focus Overlay for Lightbox Detail View */}
@@ -1035,7 +1057,6 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
                   src={filteredPhotos[slideshowIndex]?.src}
                   alt=""
                   className="w-full h-full object-cover filter blur-3xl scale-110 select-none pointer-events-none will-change-[transform,opacity]"
-                  referrerPolicy="no-referrer"
                 />
               </AnimatePresence>
             </div>
@@ -1054,7 +1075,6 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
                   <img
                     src={filteredPhotos[slideshowIndex]?.src}
                     alt={filteredPhotos[slideshowIndex]?.title}
-                    referrerPolicy="no-referrer"
                     onLoad={(e) => {
                       const img = e.currentTarget;
                       if (img.naturalWidth && img.naturalHeight) {
