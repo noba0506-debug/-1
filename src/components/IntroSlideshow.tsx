@@ -48,13 +48,13 @@ export default function IntroSlideshow({ onEnterGallery }: IntroSlideshowProps) 
     <div className="relative w-full h-[95vh] sm:h-screen overflow-hidden bg-stone-950 flex flex-col justify-between p-8 sm:p-16">
       {/* Absolute Slide Images */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 0.95, scale: 1 }}
-            exit={{ opacity: 0, transition: { duration: 1.8 } }}
-            transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.95 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
             className="absolute inset-0 w-full h-full will-change-[transform,opacity]"
           >
             <img

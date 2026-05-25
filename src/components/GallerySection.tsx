@@ -718,19 +718,17 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
 
       {/* MASONRY GRID LAYOUT */}
       <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
-        <AnimatePresence mode="popLayout">
-          {visiblePhotos.map((photo, index) => {
-            const isFeatured = photo.featured;
-            return (
-              <motion.div
-                key={photo.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.6, delay: index * 0.05, ease: 'easeOut' }}
-                className="masonry-grid-col group relative overflow-hidden bg-white rounded-2xl shadow-sm border border-stone-200/40 p-3 hover:shadow-md hover:border-stone-200 transition-all duration-300 cursor-pointer mb-6 break-inside-avoid will-change-transform"
-                onClick={() => openLightbox(photo)}
-              >
+        {visiblePhotos.map((photo, index) => {
+          const isFeatured = photo.featured;
+          return (
+            <motion.div
+              key={photo.id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: Math.min(index * 0.05, 0.3), ease: 'easeOut' }}
+              className="masonry-grid-col inline-block w-full group relative overflow-hidden bg-white rounded-2xl shadow-sm border border-stone-200/40 p-3 hover:shadow-md hover:border-stone-200 transition-all duration-300 cursor-pointer mb-6 break-inside-avoid will-change-transform"
+              onClick={() => openLightbox(photo)}
+            >
                 {/* Photo Image Wrapper */}
                 <div className="relative overflow-hidden rounded-xl bg-stone-100">
                   <img
@@ -824,7 +822,6 @@ export default function GallerySection({ sectionRef }: GallerySectionProps) {
               </motion.div>
             );
           })}
-        </AnimatePresence>
       </div>
 
       {/* Infinite Scroll Anchor & Loader */}
